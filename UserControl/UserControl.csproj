@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <Folder Include="Entities\" />
-    <Folder Include="wwwroot\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.0" />
@@ -21,12 +20,14 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="1.1.1" />
+    <PackageReference Include="Serilog.Extensions.Logging.File" Version="1.0.1" />
   </ItemGroup>
     
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
     <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="1.0.1" />
   </ItemGroup>
+  
   <PropertyGroup>
     <UserSecretsId>8e1a5c99-52dc-472e-8b39-0a2326e0db9f</UserSecretsId>
   </PropertyGroup>

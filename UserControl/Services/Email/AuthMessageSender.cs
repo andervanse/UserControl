@@ -35,7 +35,7 @@ namespace UserControl.Services
 			var client = new SendGridClient(apiKey);
 			var msg = new SendGridMessage()
 			{
-				From = new EmailAddress("andervanse@gmail.com", "UserControl"),
+				From = new EmailAddress(_options.SendGridUser, "UserControl"),
 				Subject = subject,
 				PlainTextContent = message,
 				HtmlContent = message

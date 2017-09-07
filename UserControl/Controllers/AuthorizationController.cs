@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -47,7 +48,7 @@ namespace UserControl.Controllers
 
 			try
 			{
-				var user = await _userManager.FindByNameAsync(credentials.UserName);
+				var user = await _userManager.FindByEmailAsync(credentials.Email);
 
 				if (user != null)
 				{					
@@ -59,7 +60,7 @@ namespace UserControl.Controllers
 
 						var claims = new[]
 						{
-							new Claim(JwtRegisteredClaimNames.Sub, credentials.UserName),
+							new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
 						    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
 						    new Claim(JwtRegisteredClaimNames.Email, user.Email)
 						}.Union(userClaims);				
@@ -118,13 +119,14 @@ namespace UserControl.Controllers
 			return BadRequest(model);
 		}
 
+		[Authorize(Policy = "SuperUser")]
 		[Route("register")]
 		[HttpPost]
-		public async Task<IActionResult> Register([FromBody] UserCredentials model)
+		public async Task<IActionResult> Register([FromBody] UserModel model)
 		{
 			if (ModelState.IsValid)
 			{
-				var user = new AppUser { UserName = model.UserName, Email = model.UserName };
+				var user = new AppUser { UserName = model.UserName, Email = model.Email };
 				var result = await _userManager.CreateAsync(user, model.Password);				
 
 				if (result.Succeeded)
@@ -137,8 +139,6 @@ namespace UserControl.Controllers
 					await _emailSender.SendEmailAsync(model.UserName, "Confirmação de cadastro",
 				             $"Por favor confirme seu cadastro clicando <a href='{callbackUrl}'>Aqui</a>");
 
-					// Comment out following line to prevent a new user automatically logged on.
-					// await _signInManager.SignInAsync(user, isPersistent: false);
 					_logger.LogInformation(3, "User created a new account with password.");
 					var url = Url.Link("token", null);
 					return Ok(new { message = $"por favor confirme o e-mail enviado para { model.UserName }" });
@@ -146,7 +146,6 @@ namespace UserControl.Controllers
 				AddErrors(result);
 			}
 
-			// If we got this far, something failed, redisplay form
 			return BadRequest(ModelState);
 		}
 
@@ -191,7 +190,7 @@ namespace UserControl.Controllers
 				return BadRequest(ModelState);
 			}
 
-			var user = await _userManager.FindByEmailAsync(model.UserName);
+			var user = await _userManager.FindByEmailAsync(model.Email);
 
 			if (user == null)
 			{

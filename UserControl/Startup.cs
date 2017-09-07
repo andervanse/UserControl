@@ -33,11 +33,9 @@ namespace UserControl
 			}
 
 			_config = builder.Build();
-			_env = env;
 		}
 
 		private IConfigurationRoot _config { get; }
-		private IHostingEnvironment _env { get; }
 
 		public void ConfigureServices(IServiceCollection services)
 		{
@@ -103,6 +101,7 @@ namespace UserControl
 		{
 			loggerFactory.AddConsole(_config.GetSection("Logging"));
 			loggerFactory.AddDebug();
+			loggerFactory.AddFile("Logs/userControl-{Date}.txt");
 
 			app.UseCors(config =>
 				config.AllowAnyHeader()
@@ -129,15 +128,14 @@ namespace UserControl
 
 			if (env.IsDevelopment())
 			{
-				Debug.WriteLine("Development Mode.");
-				Debug.WriteLine("Secret Info:");
-				Debug.WriteLine("ConnectionString=" + _config.GetSection("ConnectionString").Value);
+				Debug.WriteLine("DEVELOPMENT MODE.");
+				Debug.WriteLine("\tConnectionString=" + _config.GetSection("ConnectionString").Value);
 				var authMessage = _config.GetSection("AuthMessageSenderOptions").Get<AuthMessageSenderOptions>();
-				Debug.WriteLine("SendGrid User=" + authMessage.SendGridUser);
-				Debug.WriteLine("SendGrid Key=" + authMessage.SendGridKey);
-				Debug.WriteLine("Tokens:Issuer=" + _config.GetSection("Tokens:Issuer").Value);
-				Debug.WriteLine("Tokens:Audience=" + _config.GetSection("Tokens:Audience").Value);
-				Debug.WriteLine("Tokens:Key=" + _config.GetSection("Tokens:Key").Value);
+				Debug.WriteLine("\tSendGrid:User=" + authMessage.SendGridUser);
+				Debug.WriteLine("\tTokens:Issuer=" + _config.GetSection("Tokens:Issuer").Value);
+				Debug.WriteLine("\tTokens:Audience=" + _config.GetSection("Tokens:Audience").Value);
+				Debug.WriteLine("\tAdminUser:Name=" + _config["AdminUser:Name"]);
+				Debug.WriteLine("\tAdminUser:Email=" + _config["AdminUser:Email"]);
 			}
 		}
 	}
