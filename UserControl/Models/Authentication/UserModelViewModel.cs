@@ -2,7 +2,7 @@
 
 namespace UserControl.Models
 {
-	public class UserModel
+	public class UserModelViewModel
     {
 		[Required]
 		public string UserName { get; set; }

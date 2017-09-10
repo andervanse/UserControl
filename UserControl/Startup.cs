@@ -2,8 +2,11 @@
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +52,7 @@ namespace UserControl
 			services.AddSingleton(_config);
 			services.AddDbContext<ApplicationContext>(opt => opt.UseInMemoryDatabase());
 			services.AddTransient<ContextInitializer>();
+
 			services.AddIdentity<AppUser, IdentityRole>(config =>
 			{
 				config.SignIn.RequireConfirmedEmail = true;
@@ -110,7 +114,9 @@ namespace UserControl
 			);
 
 			app.UseIdentity();
-			app.UseJwtBearerAuthentication(new JwtBearerOptions() {
+
+			app.UseJwtBearerAuthentication(new JwtBearerOptions()
+			{
 				AutomaticAuthenticate = true,
 				AutomaticChallenge = true,
 				TokenValidationParameters = new TokenValidationParameters()
@@ -122,8 +128,14 @@ namespace UserControl
 				}
 			});
 
+			app.UseFacebookAuthentication(new FacebookOptions
+			{
+				AppId = _config["Authentication:Facebook:AppId"],
+				AppSecret = _config["Authentication:Facebook:AppSecret"],
+				//CallbackPath = new PathString("/api/auth/signinFacebook")
+			});
+
 			app.UseMvc();
-			
 			seeder.Seed().Wait();
 
 			if (env.IsDevelopment())

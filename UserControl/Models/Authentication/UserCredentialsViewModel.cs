@@ -2,7 +2,7 @@
 
 namespace UserControl.Models
 {
-	public class UserCredentials
+	public class UserCredentialsViewModel
     {
 		[Required(ErrorMessage = "Obrigatório")]
 		[EmailAddress(ErrorMessage = "Email inválido")]
